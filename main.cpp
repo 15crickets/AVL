@@ -4,6 +4,11 @@ Date: 8/13/2024
 Description: This program creates an AVL tree data structure
 */
 
+
+/*
+    current problem, inability to properly rotate if node that is being rotated around has 2 children
+    eg. 9 5 2 15 19 then 25
+*/
 #include <iostream>
 #include <cstring>
 #include "Node.h"
@@ -37,7 +42,6 @@ int main(){
             cout << "Enter your string of numbers: " << endl;
             for(int i = 0; i < numNums; i++){
                 int tempInt;
-                cout << "INSIDE?" << endl;
                 cin >> tempInt;
                 cout << tempInt << endl;
                 cin.get();
@@ -66,6 +70,59 @@ int main(){
     }
 }
 
+void fixTree(Node* &root, Node* current){
+    cout << "In here" << endl;
+    cout << "HELLO: " << current->getInformation() << endl;
+    current->setLongestSubtree(current->getLongestSubtree() + 1);
+    if(current == root){
+        cout << "First up" << endl;
+        return;
+    }
+    if(current->getLongestSubtree() == 1){
+        cout << "2nd time + 3rd" << endl;
+        fixTree(root, current->getParent());
+        cout << "WE'VE ARRIVED FROM THE MESS" << endl;
+        return;
+    }
+    else{
+        cout << "Third time" << endl;
+        if(current->getSibling() == NULL || current->getLongestSubtree() > (current->getSibling()->getLongestSubtree() + 1)){
+            cout << "Made it here" << endl;
+            if(current->getInformation() < current->getParent()->getInformation()){
+                cout << "here v1.0" << endl;
+                if(current->getOnlyChild()->getInformation() > current->getInformation()){
+                    cout << "HERE" << endl;
+                    leftRotation(root, current->getOnlyChild());
+                    rightRotation(root, current->getParent());
+                    return;
+                }
+                else{
+                    cout << "Here v2.0" << endl;
+                    rightRotation(root, current);
+                    return;
+                }
+            }
+            else{
+                if(current->getOnlyChild()->getInformation() < current->getInformation()){
+                    rightRotation(root, current->getOnlyChild());
+                    leftRotation(root, current->getParent());
+                    return;
+                }
+                else{
+                    leftRotation(root, current);
+                    return;
+                }
+            }
+
+        }
+        else{
+            fixTree(root, current->getParent());
+        }
+    }
+}
+
+
+/*
 void fixTree(Node* &root, Node* current){
     cout << "In here" << endl;
     if(current->getSibling() == NULL){
@@ -102,59 +159,63 @@ void fixTree(Node* &root, Node* current){
     }
     return;
 }
+*/
 
 void leftRotation(Node* &root, Node* current){
-  Node* tempGrandparent = current->getParent()->getParent();
-  Node* tempParent = current->getParent();
-  Node* tempLeft = current->getLeft();
-  if(current->getParent() == root){
+    Node* tempGrandparent = current->getParent()->getParent();
+    Node* tempParent = current->getParent();
+    Node* tempLeft = current->getLeft();
+    if(current->getParent() == root){
     root = current;
     current->setParent(NULL);
-  }
-  else{
-    current->setParent(tempGrandparent);
-    if(tempGrandparent->getInformation() > current->getInformation()){
-      tempGrandparent->setLeft(current);
     }
     else{
-      tempGrandparent->setRight(current);
+    current->setParent(tempGrandparent);
+    if(tempGrandparent->getInformation() > current->getInformation()){
+        tempGrandparent->setLeft(current);
     }
-  }
-  current->setLeft(tempParent);
-  tempParent->setParent(current);
-  tempParent->setRight(tempLeft);
-  if(tempLeft != NULL){
-    tempLeft->setParent(tempParent);
-  }
+    else{
+        tempGrandparent->setRight(current);
+    }
+    }
+    current->setLeft(tempParent);
+    tempParent->setParent(current);
+    tempParent->setRight(tempLeft);
+    if(tempLeft != NULL){
+        tempLeft->setParent(tempParent);
+    }
+    tempParent->setLongestSubtree(tempParent->getLongestSubtree() - 1);
 }
 
 void rightRotation(Node* &root, Node* current){
-  Node* tempParent = current->getParent();
-  Node* tempGrandparent = current->getParent()->getParent();
-  Node* tempRight = current->getRight();
+    Node* tempParent = current->getParent();
+    Node* tempGrandparent = current->getParent()->getParent();
+    Node* tempRight = current->getRight();
 
-  if(current->getParent() == root){
+    if(current->getParent() == root){
     root = current;
     current->setParent(NULL);
-  }
-  else{
-    current->setParent(tempGrandparent);
-    if(tempGrandparent->getInformation() > current->getInformation()){
-      tempGrandparent->setLeft(current);
     }
     else{
-      tempGrandparent->setRight(current);
+    current->setParent(tempGrandparent);
+    if(tempGrandparent->getInformation() > current->getInformation()){
+        tempGrandparent->setLeft(current);
     }
-  }
-  current->setRight(tempParent);
-  tempParent->setParent(current);
-  tempParent->setLeft(tempRight);
-  if(tempRight != NULL){
-    tempRight->setParent(tempParent);
-  }
+    else{
+        tempGrandparent->setRight(current);
+    }
+    }
+    current->setRight(tempParent);
+    tempParent->setParent(current);
+    tempParent->setLeft(tempRight);
+    if(tempRight != NULL){
+        tempRight->setParent(tempParent);
+    }
+    tempParent->setLongestSubtree(tempParent->getLongestSubtree() - 1);
 }
 
 void add(Node* &root, Node* current, Node* newNode){
+    cout << "Entered add" << endl;
     if(root == NULL){
         root = newNode;
     }
@@ -165,8 +226,11 @@ void add(Node* &root, Node* current, Node* newNode){
         }
         else{
             add(root, current->getLeft(), newNode);
+            return;
         }
+        cout << "I'm bl" << endl;
         fixTree(root, newNode);
+        cout << "UE" << endl;
     }
     else if(current->getInformation() < newNode->getInformation()){
         if(current->getRight() == NULL){
@@ -175,8 +239,11 @@ void add(Node* &root, Node* current, Node* newNode){
         }
         else{
             add(root, current->getRight(), newNode);
+            return;
         }
+        cout << "I'm GRE" << endl;
         fixTree(root, newNode);
+        cout << "EN" << endl;
     }
     
 

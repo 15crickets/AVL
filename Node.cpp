@@ -9,11 +9,16 @@ Node:: Node(){
   left = NULL;
   right = NULL;
   parent = NULL;
+  longestSubtree = 0;
 }
 
 //destructor
 Node :: ~Node(){
   parent = NULL;
+}
+
+void Node :: setLongestSubtree(int newLongest){
+  longestSubtree = newLongest;
 }
 
 //sets the current node's right node.
@@ -56,6 +61,22 @@ Node* Node :: getRight(){
 Node* Node :: getLeft(){
   return left;
 }
+
+Node* Node::getOnlyChild(){
+  cout << this->getInformation() << endl;
+  if(this->getLeft() == NULL){
+    return this->getRight();
+  }
+  else if(this->getRight() == NULL){
+    return this->getLeft();
+  }
+  return NULL;
+}
+
+int Node::getLongestSubtree(){
+  return longestSubtree;
+}
+
 
 //sets the char stored by the node.
 void Node :: setInformation(int value){

@@ -14,12 +14,16 @@ class Node{
   Node* parent;
   Node* left;
   Node* right;
+  int longestSubtree;
   int data;
   //function prototypes
   void setRight(Node* newRight);
   void setLeft(Node* newLeft);
+  void setLongestSubtree(int newLongest);
   Node* getRight();
   Node* getLeft();
+  Node* getOnlyChild();
+  int getLongestSubtree();
   void setParent(Node* newparent);
   Node* getParent();
   Node* getSibling();
